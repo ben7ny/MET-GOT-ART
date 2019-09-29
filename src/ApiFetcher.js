@@ -1,38 +1,40 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 
-class ApiFetcher extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: []
-    };
-  }
+const ApiFetcher = () => {
+  const urlCollector = () => {
+    let temp = [];
+    let url =
+      "https://collectionapi.metmuseum.org/public/collection/v1/objects/";
 
-  componentDidMount() {
-    let url = "";
-    for (let i = 1; i < 40; i++) {
-      url =
-        "https://collectionapi.metmuseum.org/public/collection/v1/objects/" + i;
-
-      fetch(url)
-        .then(res => res.json())
-        .then(json => this.setState({ data: [...this.state.data, json] }));
+    for (let i = 1; i < 20; i++) {
+      temp.push(url + i);
     }
-  }
 
-  render() {
-    return (
-      <>
-        <h1>Info</h1>
+    return temp;
+  };
 
-        <ul>
-          {this.state.data.map(obj => (
-            <li key={obj.objectID}>{obj.accessionNumber}</li>
-          ))}
-        </ul>
-      </>
-    );
-  }
-}
+  let URLs = urlCollector();
+
+  const UrlRender = props => {
+    const [data, setData] = useState([]);
+    useEffect(() => {
+      fetch(props.url)
+        .then(res => res.json())
+        .then(json => setData(json));
+    }, []);
+
+    return <li>{data.accessionNumber}</li>;
+  };
+
+  return (
+    <>
+      <ul>
+        {URLs.map(url => (
+          <UrlRender url={url} key={url} />
+        ))}
+      </ul>
+    </>
+  );
+};
 
 export default ApiFetcher;
